@@ -1,0 +1,7 @@
+# ignore READMET.TTX
+README.txt
+
+# ignore folder named 
+py3_prj
+# ignore all java files
+*.jave
