@@ -5,7 +5,20 @@ from forms import SignupForm, LoginForm, AddressForm
 app = Flask(__name__)
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = # add your Heroku Postgres database URL here
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost/learningflask'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost/learningflask'
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost/learningflask'
+# sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1045 (28000): 
+# Access denied for user 'root'@'localhost' (using password: NO) 
+# This error is a DBAPI Error and originates from the database driver (DBAPI), not SQLAlchemy itself.
+
+# also if try connect as another db users loma 'mysql+mysqlconnector://loma@localhost
+# Access denied for user 'loma'@'%' to database 'learningflask'  <-- this user no access to this database
+# fix - supply password with username e.g bou:bou and only authorised users who can access db and erad/write to it
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://bou:bou@localhost/learningflask'
+
+# ModuleNotFoundError: No module named 'MySQLdb' if don't specify mysql+mysqlconnector
+#connection_string = 'mysql+mysqlconnector://' + database_user + ':' + database_password + '@' + database_host + ':' + database_port + '/' + database_name
 
 db.init_app(app)
 
@@ -30,7 +43,8 @@ def signup():
     if form.validate() == False:
       return render_template('signup.html', form=form)
     else:
-      newuser = User(form.first_name.data, form.last_name.data, form.email.data, form.password.data)
+      newuser = User(form.first_name.data, form.last_name.data,\
+                     form.email.data, form.password.data)
       db.session.add(newuser)
       db.session.commit()
 
@@ -77,7 +91,7 @@ def home():
   form = AddressForm()
 
   places = []
-  my_coordinates = (-29.4221, -152.0844)
+  my_coordinates = (-27.570278, 153.008056)
 
   if request.method == 'POST':
     if form.validate() == False:
@@ -92,10 +106,12 @@ def home():
       places = p.query(address)
 
       # return those results
-      return render_template('home.html', form=form, my_coordinates=my_coordinates, places=places)
+      return render_template('home.html', form=form, \
+        my_coordinates=my_coordinates, places=places)
 
   elif request.method == 'GET':
-    return render_template("home.html", form=form, my_coordinates=my_coordinates, places=places)
+    return render_template("home.html", form=form, \
+      my_coordinates=my_coordinates, places=places)
 
 if __name__ == "__main__":
   app.run(debug=True)
